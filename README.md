@@ -242,7 +242,7 @@ curl -X GET \
   "https://your-api-id.execute-api.region.amazonaws.com/stage/status/arn:aws:states:us-east-1:123456789012:execution:OrderProcessingStateMachine:yourarnstepfunction""
 ```
 
-#### Response – 200 OK
+#### Response – 200 OKK
 
 ```json
 {
