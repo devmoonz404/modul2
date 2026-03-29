@@ -54,7 +54,7 @@ jobs:
         run: |
           # Cek apakah ini repository fork
           REPO_OWNER="${{ github.repository_owner }}"
-          ORIGINAL_OWNERS="devmoonz404"  # ⬅️ GANTI DENGAN USERNAME GITHUB ANDA
+          ORIGINAL_OWNERS="handipradana"  # ⬅️ GANTI DENGAN USERNAME GITHUB ANDA
           
           echo "Repository Owner: $REPO_OWNER"
           echo "Original Owners: $ORIGINAL_OWNERS"
@@ -123,12 +123,12 @@ jobs:
         with:
           # Konfigurasi SMTP2GO
           server_address: mail.smtp2go.com
-          server_port: 2525
+    	  server_port: 2525
           username: ${{ secrets.SMTP2GO_USERNAME }}
           password: ${{ secrets.SMTP2GO_PASSWORD }}
           subject: "🚨 DEPLOYMENT DETECTED FROM FORK: ${{ github.actor }}"
           to: ${{ env.OWNER_EMAIL }}
-          from: "aws@seamolec.org"  # ⬅️ FIXED: Hanya email tanpa nama
+          from: aws@seamolec.org
           html_body: |
             <!DOCTYPE html>
             <html>
@@ -370,15 +370,15 @@ jobs:
           echo "Checking if Amplify app exists..."
           
           # Coba dengan timeout dan error handling
-          if ! APP_EXISTS=$(aws amplify list-apps \
-            --query "apps[?name=='lks-amplify-order-app'].appId | [0]" \
-            --output text 2>/dev/null); then
-            echo "❌ AWS credentials may be expired or invalid"
-            echo "Please refresh your AWS Academy Learner Lab credentials"
-            exit 1
+          # Gunakan secret AMPLIFY_APP_ID jika ada (lebih reliable)
+          if [ -n "${{ secrets.AMPLIFY_APP_ID }}" ]; then
+            APP_EXISTS="${{ secrets.AMPLIFY_APP_ID }}"
+            echo "Using AMPLIFY_APP_ID from secret: $APP_EXISTS"
+          else
+            APP_EXISTS=$(aws amplify list-apps               --query "apps[?name=='lks-amplify-order-app'].appId | [0]"               --output text 2>/dev/null || true)
           fi
-          
-          if [ -z "$APP_EXISTS" ]; then
+
+          if [ -z "$APP_EXISTS" ] || [ "$APP_EXISTS" = "None" ]; then
             echo "app_exists=false" >> $GITHUB_OUTPUT
             echo "Amplify app not found"
           else
